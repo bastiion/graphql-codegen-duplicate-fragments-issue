@@ -1,0 +1,19 @@
+overwrite: true
+schema:
+  - https://api.spacex.land/graphql
+documents: 'graphql/**/*.graphql'
+generates:
+  graphql/generated/index.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-query'
+    config:
+      addInfiniteQuery: true
+      pureMagicComment: true
+      fetcher:
+        func: ../fetcher#useFetchData
+        isReactHook: true
+  graphql/generated/schema.json:
+    plugins:
+      - 'introspection'
