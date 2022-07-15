@@ -1,17 +1,116 @@
 Issue:
-When using `addInfiniteQuery: true` and `reactHook: true` and has another hook within, the infinite query throws the following error:
+### Describe the bug
 
+When using fragments in queries which use fragements in multiple positions, the fragments are beeing repeated in the string concatenation, so that most server will complain about it `Error: There can be only one fragment named "addressFields".`
+
+### Your Example Website or App
+
+https://github.com/bastiion/graphql-codegen-duplicate-fragments-issue
+
+### Steps to Reproduce the Bug or Issue
+
+1. formulate a query that uses same fragments within two other fragments
+2. run codegen
+
+
+### Expected behavior
+
+fragments must be deduplicated
+
+### Screenshots or Videos
+
+_No response_
+
+### Platform
+
+-    "@graphql-codegen/cli": "2.3.0",
+-    "@graphql-codegen/fragment-matcher": "~3.3.0",
+-    "@graphql-codegen/introspection": "~2.2.0",
+-    "@graphql-codegen/typescript": "~2.7.1",
+-    "@graphql-codegen/typescript-document-nodes": "~2.3.1",
+-    "@graphql-codegen/typescript-operations": "~2.5.1",
+-    "@graphql-codegen/typescript-react-query": "~3.6.1",
+
+
+### Codegen Config File
+
+```yaml
+overwrite: true
+schema:
+  - http://localhost:9002/graphql
+documents: 'graphql/**/*.graphql'
+generates:
+  graphql/generated/index.ts:
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+      - 'typescript-react-query'
+    config:
+      pureMagicComment: true
+      fetcher:
+        func: ../fetcher#useFetchData
+        isReactHook: true
 ```
-Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
-1. You might have mismatching versions of React and the renderer (such as React DOM)
-2. You might be breaking the Rules of Hooks
-3. You might have more than one copy of React in the same app
-See https://reactjs.org/link/invalid-hook-call for tips about how to debug and fix this problem.
+
+### Additional context
+
+example query:
+
+```graphql
+fragment addressFields on Address {
+  address
+  city
+}
+
+fragment personFields on Person {
+  name
+  address {
+    ...addressFields
+  }
+}
+
+query company {
+  company {
+    name
+    address {
+      ...addressFields
+    }
+    employees {
+      ...personFields
+    }
+  }
+}
 ```
 
-Expected Result:
-All hooks should be called without issue, the same as when using a normal query.
+will produce:
 
-Additional Details:
-
-See the commented code in `graphql/fetcher.ts` for details an easy toggle for causing the error.
+```ts
+export const AddressFieldsFragmentDoc = /*#__PURE__*/ `
+    fragment addressFields on Address {
+  address
+  city
+}
+    `;
+export const PersonFieldsFragmentDoc = /*#__PURE__*/ `
+    fragment personFields on Person {
+  name
+  address {
+    ...addressFields
+  }
+}
+    ${AddressFieldsFragmentDoc}`;
+export const CompanyDocument = /*#__PURE__*/ `
+    query company {
+  company {
+    name
+    address {
+      ...addressFields
+    }
+    employees {
+      ...personFields
+    }
+  }
+}
+    ${AddressFieldsFragmentDoc}
+${PersonFieldsFragmentDoc}`;
+```
