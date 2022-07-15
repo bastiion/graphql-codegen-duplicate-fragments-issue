@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import {useCompanyQuery, useInfiniteCompanyQuery, useInfiniteUsersQuery} from '../graphql/generated';
+import {useCompanyQuery} from '../graphql/generated';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {

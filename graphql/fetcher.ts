@@ -1,9 +1,21 @@
-import { useGraphQLContext } from '../context/graphql';
+import { parse, print } from 'graphql'
+
 export const useFetchData = <TData, TVariables>(
   query: string,
 ): (() => Promise<TData>) => {
-  // FAILING: using a hook inside the fetcher
-  //const { endpoints } = useGraphQLContext();
+
+  const parsedQuery = parse(query)
+  const alreadyVisitedQueryNames: string[] = []
+  const fixedQuery = print({
+    ...parsedQuery,
+    definitions:  parsedQuery.definitions.filter(def => {
+      if(!(def.kind === 'FragmentDefinition' && alreadyVisitedQueryNames.includes(def.name.value))) {
+        if(def.kind === 'FragmentDefinition') alreadyVisitedQueryNames.push(def.name.value)
+        return true
+      }
+    })
+  })
+
 
   // PASSING: mocking the data so we don't use a hook inside the fetcher
   const endpoints = {
@@ -16,7 +28,7 @@ export const useFetchData = <TData, TVariables>(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query,
+        query: fixedQuery,
         variables,
       }),
     });
