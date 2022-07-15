@@ -1,6 +1,6 @@
 overwrite: true
 schema:
-  - https://api.spacex.land/graphql
+  - http://localhost:9002/graphql
 documents: 'graphql/**/*.graphql'
 generates:
   graphql/generated/index.ts:
@@ -9,7 +9,6 @@ generates:
       - 'typescript-operations'
       - 'typescript-react-query'
     config:
-      addInfiniteQuery: true
       pureMagicComment: true
       fetcher:
         func: ../fetcher#useFetchData

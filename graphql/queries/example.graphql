@@ -1,0 +1,23 @@
+fragment addressFields on Address {
+  address
+  city
+}
+
+fragment personFields on Person {
+  name
+  address {
+    ...addressFields
+  }
+}
+
+query company {
+  company {
+    name
+    address {
+      ...addressFields
+    }
+    employees {
+      ...personFields
+    }
+  }
+}

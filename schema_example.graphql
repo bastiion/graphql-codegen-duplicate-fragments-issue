@@ -1,0 +1,26 @@
+# This file was generated based on ".graphqlconfig". Do not edit manually.
+
+schema {
+    query: Query
+}
+
+type Address {
+    address: String @fake(type: streetAddress)
+    city: String
+}
+
+type Person {
+    name: String @fake(type: firstName, locale: en_GB)
+    address: Address
+}
+
+type Company {
+    name: String @fake(type: firstName, locale: en_GB)
+    address: Address
+    employees: [Person]
+}
+
+
+type Query {
+    company: Company
+}

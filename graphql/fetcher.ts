@@ -7,7 +7,7 @@ export const useFetchData = <TData, TVariables>(
 
   // PASSING: mocking the data so we don't use a hook inside the fetcher
   const endpoints = {
-    spacex: 'https://api.spacex.land/graphql/',
+    spacex: 'http://localhost:9002/graphql',
   };
   return async (variables?: TVariables) => {
     const res = await fetch(endpoints.spacex, {
